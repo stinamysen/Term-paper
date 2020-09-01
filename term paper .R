@@ -8,7 +8,7 @@ library(readr)
 
 nba <-read.csv("basket.csv") %>% 
   filter(League=="NBA") %>% 
-  select(Season, Player, Stage, MIN, FGM, FGA, X3PM, X3PA, FTM, FTA) %>% 
+  select(Season, Player, Stage, GP, MIN, FGM, BLK, FGA, X3PM, X3PA, FTM, FTA) %>% 
   filter(Stage !="Playoffs") %>% 
   mutate(h_rate= FGM/FGA)  %>%
   mutate(poeng_pr_k = FGM/GP) %>%
