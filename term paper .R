@@ -1,3 +1,4 @@
+library(gganimate)
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -15,9 +16,6 @@ nba <-read.csv("basket.csv") %>%
   mutate(block_pr_k = BLK/GP) %>%
   mutate(block_pr_min = BLK/MIN)
 
-
-
-
 best<- function(data, players) {
   h.rate<- data %>% 
     filter(Player%in%players) %>% 
@@ -29,4 +27,4 @@ best<- function(data, players) {
 
 best(data, players)
 
-#test
+#test2
