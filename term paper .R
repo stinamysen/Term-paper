@@ -10,8 +10,6 @@ library(gganimate)
 library(car)
 library(gifski)
 
-
-
 nba <-read.csv("basket.csv") %>% 
   filter(League=="NBA") %>% 
   select(Season, Player, Stage, GP, MIN, FGM, BLK, FGA, X3PM, X3PA, FTM, FTA, height_cm) %>% 
@@ -39,18 +37,16 @@ nba
 
 
           
-best<- function(data, players, target) {
+best<- function(data, players) {
   gif<- data %>% 
     filter(Player%in%players) %>%
-    ggplot(aes(x=Season, y=target, group=Player, colour=Player))+
+    ggplot(aes(x=Season, y=h_rate, group=Player, colour=Player))+
     geom_line() +
     transition_reveal(Season)
   
   return(gif)
 }
 
-
-best(data=nba,players=c( ),target=h_rate )
 
 g <- best(data=nba, players=c("LeBron James", "Kevin Durant"))
 
@@ -71,7 +67,7 @@ nba$beta_hight<-NA
 #This for-loop is omitting one player at time and then add the p- value and Beta to the new the columns
 for(i in 1:nrow(nba)){
   nba$p_value[i] <- 
-    lm(h_rate~ height_cm, data=nba, subset=-i) %>%#remowing (by subset=-i) one of the player
+    lm(h_rate~ height_cm, data=nba, subset=-i) %>%#removing (by subset=-i) one of the player
     summary %>%  
     coef %>% 
     .[2, 4]    #Selecting the p-value from the regression output
