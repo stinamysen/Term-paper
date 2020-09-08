@@ -34,8 +34,6 @@ nba <-read.csv("basket.csv") %>%
   )) %>%
   mutate(Season = as.numeric(Season))
 nba
-
-
           
 best<- function(data, players) {
   gif<- data %>% 
