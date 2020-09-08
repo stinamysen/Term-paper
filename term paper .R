@@ -34,19 +34,19 @@ nba <-read.csv("basket.csv") %>%
   )) %>%
   mutate(Season = as.numeric(Season))
 nba
-          
-best<- function(data, players) {
-  gif<- data %>% 
+
+best <- function(data, players, column) {
+  column <- enquo(column)
+  plot.nba <- data %>%
     filter(Player%in%players) %>%
-    ggplot(aes(x=Season, y=h_rate, group=Player, colour=Player))+
+    ggplot(aes(x=Season, y=!!column, group=Player, colour=Player))+
     geom_line() +
     transition_reveal(Season)
   
-  return(gif)
+  return(plot.nba)
 }
 
-
-g <- best(data=nba, players=c("LeBron James", "Kevin Durant"))
+g <- best(data = nba, players = c("LeBron James", "Kevin Durant"), GP)
 
 #Animate g
 animate(g, duration = 5, fps = 20, width = 650, height = 450, renderer = gifski_renderer())
