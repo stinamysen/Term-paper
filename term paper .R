@@ -10,9 +10,13 @@ library(gganimate)
 library(car)
 library(gifski)
 library(plyr)
+library(usmap)
+
+
+
 
 nba <-read.csv("basket.csv") %>% 
-  filter(League=="NBA") %>% 
+  filter(League=="NBA") %>%
   select(Season, Player, Stage, Team, GP, MIN, FGM, BLK, FGA, X3PM, X3PA, FTM, FTA, height_cm) %>% 
   filter(Stage !="Playoffs") %>% 
   mutate(h_rate= FGM/FGA)%>%
@@ -100,37 +104,87 @@ reg<- function(dataf, players, season) {
 #test:
 reg(dataf=nba, players = c("LeBron James", "Kevin Durant", "Kobe Bryant", "Chris Bosh"), season=2010)
 
-<<<<<<< HEAD
-south<-c("OKC","MIA","DAL","LAL","DEN", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
-midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
-northeast<-c("NYK", "NJN", "PHI", "BOS", "BRK")
-west<-c("GSW", "UTA", "SAC", "LAC", "POR","WAS")
+#Lager variabler for lagene som tilhører de ulike regionene
 
-teams<-
-  nba %>%
-  distinct(Team) %>% 
+#south<-c("OKC","MIA","DAL","LAL", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
+#midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
+#northeast<-c("NYK", "NJN", "PHI", "BOS", "BRK")
+#west<-c("GSW", "UTA", "SAC", "LAC", "POR","WAS", "DEN")
+
+OK<-"OKC"
+FL<-c("MIA","ORL")
+TX<-c("DAL","HOU","SAS")
+AZ<-c("PHX")
+TN<-c("MEM")
+NC<-c("CHA")
+GA<-c("ATL")
+LA<-c("NOP")
+OH<-c("CLE")
+IL<-c("CHI")
+IN<-c("IND")
+MN<-"MIN"
+WI<-"MIL"
+MI<-"DET"
+NY<-c("NYK","BRK")
+NJ<-"NJN"
+PA<-"PHI"
+MA<-"BOS"
+CA<-c("GSW","LAC","SAC", "LAL")
+OR<-"POR"
+UT<-"UTA"
+CO<-"DEN"
+WA<-"WAS"
+
+#Lager nytt data sett som inkluderer en ny kolonne med "relioner" og fordeler de ulike lagene inn i south, midwest, northeast og west.
+#Fjerner "TOR" siden det er et lag fra Canada som ikke skal være med på heatmapen. 
+
+heat <- nba %>%
+  filter(Team!="TOR")%>%
+  mutate(State = case_when(Team %in% OK ~ "OK",
+                           Team %in% FL ~ "FL",
+                           Team %in% AZ ~ "AZ",
+                           Team %in% TN ~ "TN",
+                           Team %in% NC ~ "NC",
+                           Team %in% GA ~ "GA",
+                           Team %in% LA ~ "LA",
+                           Team %in% OH ~ "OH",
+                           Team %in% IL ~ "IL",
+                           Team %in% IN ~ "IN",
+                           Team %in% MN ~ "MN",
+                           Team %in% MI ~ "MI",
+                           Team %in% NY ~ "NY",
+                           Team %in% NJ ~ "NJ",
+                           Team %in% PA ~ "PA",
+                           Team %in% MA ~ "MA",
+                           Team %in% CA ~ "CA",
+                           Team %in% OR ~ "OR",
+                           Team %in% UT ~ "UT",
+                           Team %in% CO ~ "CO",
+                           Team %in% WA ~ "WA",
+                           Team %in% TX ~ "TX",
+                           Team%in% WI ~ "WI"
+                                      )) %>% 
+  mutate(State = as.character(State)) %>% 
+  filter(Season==2009) %>% 
+  select(State,h_rate) %>% 
+  group_by(State) %>% 
+  summarize(m_h_rate=mean(h_rate))->heat
+
+as.data.frame(heat)
+colnames(heat)
+colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
+
+merge<-left_join(heat,statepop)
+
+plot_usmap(data=merge, values="m_h_rate", color="red") + 
+  scale_fill_continuous(high="red", low="white")+
+  theme(legend.position = "right") + labs(fill="Hit Rate") +
+  ggtitle("2009 Hit Rate Average")
+  
 
 
-heatmap <-nba %>%
-  mutate(Region=Team) %>%
-  for(i in nrow(Region)){
-    if(Region%in%south){
-      mutate(Region[i]="South")
-    }
-    else if(Region%in%midwest){
-      mutate(Region[i]="Midwest")
-    }
-    else if(Region%in%northeast){
-      mutate(Region[i]="NorthEast")
-    }
-    else{
-      mutate(Region[i]="West")
-    }
-  }
-heatmap
-  
-  
-=======
-heatmap <-read.csv("basket.csv") %>% 
->>>>>>> 596fcb6da1946251f7e59f09097bcc7ba9ed6d86
-  
+
+
+
+
+
