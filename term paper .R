@@ -99,4 +99,5 @@ reg<- function(dataf, players, season) {
 #test:
 reg(dataf=nba, players = c("LeBron James", "Kevin Durant", "Kobe Bryant", "Chris Bosh"), season=2010)
 
-
+heatmap <-read.csv("basket.csv") %>% 
+  
