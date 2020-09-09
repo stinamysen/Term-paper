@@ -9,10 +9,11 @@ library(readr)
 library(gganimate)
 library(car)
 library(gifski)
+library(plyr)
 
 nba <-read.csv("basket.csv") %>% 
   filter(League=="NBA") %>% 
-  select(Season, Player, Stage, GP, MIN, FGM, BLK, FGA, X3PM, X3PA, FTM, FTA, height_cm) %>% 
+  select(Season, Player, Stage, Team, GP, MIN, FGM, BLK, FGA, X3PM, X3PA, FTM, FTA, height_cm) %>% 
   filter(Stage !="Playoffs") %>% 
   mutate(h_rate= FGM/FGA)%>%
   mutate(poeng_pr_k = FGM/GP) %>%
@@ -99,4 +100,33 @@ reg<- function(dataf, players, season) {
 #test:
 reg(dataf=nba, players = c("LeBron James", "Kevin Durant", "Kobe Bryant", "Chris Bosh"), season=2010)
 
+south<-c("OKC","MIA","DAL","LAL","DEN", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
+midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
+northeast<-c("NYK", "NJN", "PHI", "BOS", "BRK")
+west<-c("GSW", "UTA", "SAC", "LAC", "POR","WAS")
 
+teams<-
+  nba %>%
+  distinct(Team) %>% 
+
+
+heatmap <-nba %>%
+  mutate(Region=Team) %>%
+  for(i in nrow(Region)){
+    if(Region%in%south){
+      mutate(Region[i]="South")
+    }
+    else if(Region%in%midwest){
+      mutate(Region[i]="Midwest")
+    }
+    else if(Region%in%northeast){
+      mutate(Region[i]="NorthEast")
+    }
+    else{
+      mutate(Region[i]="West")
+    }
+  }
+heatmap
+  
+  
+  
