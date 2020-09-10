@@ -105,6 +105,7 @@ reg<- function(dataf, players, season) {
 reg(dataf=nba, players = c("LeBron James", "Kevin Durant", "Kobe Bryant", "Chris Bosh"), season=2010)
 
 #Lager variabler for lagene som tilhører de ulike regionene
+<<<<<<< HEAD
 
 #south<-c("OKC","MIA","DAL","LAL", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
 #midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
@@ -188,3 +189,19 @@ plot_usmap(data=merge, values="m_h_rate", color="red") +
 
 
 
+=======
+south<-c("OKC","MIA","DAL","LAL","DEN", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
+midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
+northeast<-c("NYK", "NJN", "PHI", "BOS", "BRK")
+west<-c("GSW", "UTA", "SAC", "LAC", "POR","WAS")
+
+#Lager nytt data sett som inkluderer en ny kolonne med "relioner" og fordeler de ulike lagene inn i south, midwest, northeast og west.
+#Fjerner "TOR" siden det er et lag fra Canada som ikke skal være med på heatmapen. 
+heatmap <- nba %>%
+  filter(Team!="TOR")%>%
+  mutate(Region = case_when(Team %in% south ~ "South",
+                            Team %in% midwest ~ "Midwest",
+                            Team %in% northeast ~ "Northeast",
+                            Team %in% west ~ "West"))
+heatmap
+>>>>>>> 33aadf40c83c83178a7cb15dee98717b5891c5ac
