@@ -14,7 +14,7 @@ library(usmap)
 
 
 
-
+#making a data frame of the csv, and adding multiple columnes that says something about how good a player is:
 nba <-read.csv("basket.csv") %>% 
   filter(League=="NBA") %>%
   select(Season, Player, Stage, Team, GP, MIN, FGM, BLK, FGA, X3PM, X3PA, FTM, FTA, height_cm) %>% 
@@ -25,8 +25,8 @@ nba <-read.csv("basket.csv") %>%
   mutate(block_pr_k = BLK/GP) %>%
   mutate(block_pr_min = BLK/MIN) %>%
   mutate(Season = recode(
-    Season,
-    "'2009 - 2010' = '2009';
+    Season,                 
+    "'2009 - 2010' = '2009'; 
     '2010 - 2011' = '2010';
     '2011 - 2012' = '2011';
     '2012 - 2013' = '2012';
@@ -37,26 +37,26 @@ nba <-read.csv("basket.csv") %>%
     '2017 - 2018' = '2017';
     '2018 - 2019' = '2018'"
   )) %>%
-  mutate(Season = as.numeric(Season))
-nba
+  mutate(Season = as.numeric(Season)) #change the seasons to one year and to numeric.
+                                      #This makes it possible to use this column in the best funtion
 
 best <- function(data, players, column) {
-  column <- enquo(column)
+  column <- enquo(column) #first we quote the column (by using enquo()) function
   plot.nba <- data %>%
     filter(Player%in%players) %>%
-    ggplot(aes(x=Season, y=!!column, group=Player, colour=Player))+
+    ggplot(aes(x=Season, y=!!column, group=Player, colour=Player))+ #then we unquote the column (by "!!")  so we can read the value of the column
     geom_line() +
-    transition_reveal(Season)
+    transition_reveal(Season) #to make the plot gradually appear
   
   return(plot.nba)
 }
-
+#making a variable to put in the animate function
 g <- best(data = nba, players = c("LeBron James", "Kevin Durant"), GP)
 
 #Animate g
 animate(g, duration = 5, fps = 20, width = 650, height = 450, renderer = gifski_renderer())
 
-# Save at gif:
+# Save as a gif:
 anim_save("Basketball_timeilne.gif")
 
 
@@ -104,8 +104,6 @@ reg<- function(dataf, players, season) {
 #test:
 reg(dataf=nba, players = c("LeBron James", "Kevin Durant", "Kobe Bryant", "Chris Bosh"), season=2010)
 
-#Lager variabler for lagene som tilhører de ulike regionene
-<<<<<<< HEAD
 
 #south<-c("OKC","MIA","DAL","LAL", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
 #midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
