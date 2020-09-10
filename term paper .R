@@ -112,6 +112,7 @@ reg(dataf=nba, players = c("LeBron James", "Kevin Durant", "Kobe Bryant", "Chris
 #northeast<-c("NYK", "NJN", "PHI", "BOS", "BRK")
 #west<-c("GSW", "UTA", "SAC", "LAC", "POR","WAS", "DEN")
 
+#Creating variables and vectors which says which teams that each state consist of
 OK<-"OKC"
 FL<-c("MIA","ORL")
 TX<-c("DAL","HOU","SAS")
@@ -136,9 +137,8 @@ UT<-"UTA"
 CO<-"DEN"
 WA<-"WAS"
 
-#Lager nytt data sett som inkluderer en ny kolonne med "relioner" og fordeler de ulike lagene inn i south, midwest, northeast og west.
-#Fjerner "TOR" siden det er et lag fra Canada som ikke skal være med på heatmapen. 
-
+ 
+#Making a new data frame which includes a new column "State"
 heat <- nba %>%
   filter(Team!="TOR")%>%
   mutate(State = case_when(Team %in% OK ~ "OK",
@@ -165,19 +165,20 @@ heat <- nba %>%
                            Team %in% TX ~ "TX",
                            Team%in% WI ~ "WI"
                                       )) %>% 
-  mutate(State = as.character(State)) %>% 
   filter(Season==2009) %>% 
   select(State,h_rate) %>% 
   group_by(State) %>% 
   summarize(m_h_rate=mean(h_rate))->heat
 
-as.data.frame(heat)
-colnames(heat)
+#changing the colname of the statecodes from the statepop dataframe to "State"
 colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
 
+#merging the two data frames
 merge<-left_join(heat,statepop)
 
-plot_usmap(data=merge, values="m_h_rate", color="red") + 
+#plotting a heatmap
+heatmap<-
+  plot_usmap(data=merge, values="m_h_rate", color="red") + 
   scale_fill_continuous(high="red", low="white")+
   theme(legend.position = "right") + labs(fill="Hit Rate") +
   ggtitle("2009 Hit Rate Average")
