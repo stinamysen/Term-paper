@@ -9,7 +9,7 @@ library(readr)
 library(gganimate)
 library(car)
 library(gifski)
-library(plyr)
+
 library(usmap)
 
 
@@ -164,15 +164,16 @@ heat <- nba %>%
                            Team%in% WI ~ "WI"
                                       )) %>% 
   filter(Season==2009) %>% 
-  select(State,h_rate) %>% 
-  group_by(State) %>% 
-  summarize(m_h_rate=mean(h_rate))->heat
+  select(State,h_rate) 
 
+colnames(heat)
 #changing the colname of the statecodes from the statepop dataframe to "State"
 colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
 
 #merging the two data frames
-merge<-left_join(heat,statepop)
+merge<-left_join(heat,statepop) 
+  
+  
 
 #plotting a heatmap
 heatmap<-
@@ -188,19 +189,4 @@ heatmap<-
 
 
 
-=======
-south<-c("OKC","MIA","DAL","LAL","DEN", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
-midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
-northeast<-c("NYK", "NJN", "PHI", "BOS", "BRK")
-west<-c("GSW", "UTA", "SAC", "LAC", "POR","WAS")
 
-#Lager nytt data sett som inkluderer en ny kolonne med "relioner" og fordeler de ulike lagene inn i south, midwest, northeast og west.
-#Fjerner "TOR" siden det er et lag fra Canada som ikke skal være med på heatmapen. 
-heatmap <- nba %>%
-  filter(Team!="TOR")%>%
-  mutate(Region = case_when(Team %in% south ~ "South",
-                            Team %in% midwest ~ "Midwest",
-                            Team %in% northeast ~ "Northeast",
-                            Team %in% west ~ "West"))
-heatmap
->>>>>>> 33aadf40c83c83178a7cb15dee98717b5891c5ac
