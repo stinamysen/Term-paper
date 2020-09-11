@@ -9,10 +9,8 @@ library(readr)
 library(gganimate)
 library(car)
 library(gifski)
-
 library(usmap)
-
-
+library(readxl)
 
 #making a data frame of the csv, and adding multiple columnes that says something about how good a player is:
 nba <-read.csv("basket.csv") %>% 
@@ -40,11 +38,13 @@ nba <-read.csv("basket.csv") %>%
   mutate(Season = as.numeric(Season)) #change the seasons to one year and to numeric.
                                       #This makes it possible to use this column in the best funtion
 
-best <- function(data, players, column) {
-  column <- enquo(column) #first we quote the column (by using enquo()) function
+#GIF 
+#Making function for ggplot of the wanted ---
+best <- function(data, players, target) {
+  target <- enquo(target) #first we quote the target (by using enquo()) function
   plot.nba <- data %>%
-    filter(Player%in%players) %>%
-    ggplot(aes(x=Season, y=!!column, group=Player, colour=Player))+ #then we unquote the column (by "!!")  so we can read the value of the column
+    filter(Player%in%players) %>% #Filtering so that we only get the wanted players
+    ggplot(aes(x=Season, y=!!target, group=Player, colour=Player))+ #then we unquote the target (by "!!")  so we can read the value of the column
     geom_line() +
     transition_reveal(Season) #to make the plot gradually appear
   
@@ -60,6 +60,7 @@ animate(g, duration = 5, fps = 20, width = 650, height = 450, renderer = gifski_
 anim_save("Basketball_timeilne.gif")
 
 
+#REGRESSION 
 # Regression on how the height affects the hitting rate
 summary(lm(h_rate~height_cm, data=nba))
 
@@ -85,7 +86,6 @@ for(i in 1:nrow(nba)){
 remove<- "removed" 
 
 #Creating a function for the regression model
-
 reg<- function(dataf, players, season) {
   p_plot<-
   dataf %>% 
@@ -105,89 +105,39 @@ reg<- function(dataf, players, season) {
 reg(dataf=nba, players = c("LeBron James", "Kevin Durant", "Kobe Bryant", "Chris Bosh"), season=2010)
 
 
-#south<-c("OKC","MIA","DAL","LAL", "PHX", "MEM", "CHA", "ATL", "HOU", "NOP","ORL", "SAS")
-#midwest<-c("CLE","CHI", "IND","MIN","MIL", "DET")
-#northeast<-c("NYK", "NJN", "PHI", "BOS", "BRK")
-#west<-c("GSW", "UTA", "SAC", "LAC", "POR","WAS", "DEN")
+#HEATMAP
+#Reading data from excel file and merging the data frame nba and state
+State <- read_xls("Statkoder.xls")
+merge_stat <- left_join(nba,State)
 
-#Creating variables and vectors which says which teams that each state consist of
-OK<-"OKC"
-FL<-c("MIA","ORL")
-TX<-c("DAL","HOU","SAS")
-AZ<-c("PHX")
-TN<-c("MEM")
-NC<-c("CHA")
-GA<-c("ATL")
-LA<-c("NOP")
-OH<-c("CLE")
-IL<-c("CHI")
-IN<-c("IND")
-MN<-"MIN"
-WI<-"MIL"
-MI<-"DET"
-NY<-c("NYK","BRK")
-NJ<-"NJN"
-PA<-"PHI"
-MA<-"BOS"
-CA<-c("GSW","LAC","SAC", "LAL")
-OR<-"POR"
-UT<-"UTA"
-CO<-"DEN"
-WA<-"WAS"
-
- 
-#Making a new data frame which includes a new column "State"
-heat <- nba %>%
-  filter(Team!="TOR")%>%
-  mutate(State = case_when(Team %in% OK ~ "OK",
-                           Team %in% FL ~ "FL",
-                           Team %in% AZ ~ "AZ",
-                           Team %in% TN ~ "TN",
-                           Team %in% NC ~ "NC",
-                           Team %in% GA ~ "GA",
-                           Team %in% LA ~ "LA",
-                           Team %in% OH ~ "OH",
-                           Team %in% IL ~ "IL",
-                           Team %in% IN ~ "IN",
-                           Team %in% MN ~ "MN",
-                           Team %in% MI ~ "MI",
-                           Team %in% NY ~ "NY",
-                           Team %in% NJ ~ "NJ",
-                           Team %in% PA ~ "PA",
-                           Team %in% MA ~ "MA",
-                           Team %in% CA ~ "CA",
-                           Team %in% OR ~ "OR",
-                           Team %in% UT ~ "UT",
-                           Team %in% CO ~ "CO",
-                           Team %in% WA ~ "WA",
-                           Team %in% TX ~ "TX",
-                           Team%in% WI ~ "WI"
-                                      )) %>% 
-  filter(Season==2009) %>% 
-  select(State,h_rate) %>% 
-  group_by(State) %>% 
-  summarize(m_h_rate=mean(h_rate))
-
-colnames(heat)
-#changing the colname of the statecodes from the statepop dataframe to "State"
-colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
-
-#merging the two data frames
-merge<-left_join(heat,statepop) 
+heatmap <- function (data,season,target){
+  #Making target a quote
+  target <- enquo(target)
+  #Making a new data frame which shows the states and the mean of target
+  heat <- data %>%
+    filter(Team!="TOR")%>%
+    filter(Season==season) %>% 
+    select(State,!!target) %>% 
+    group_by(State) %>% 
+    summarize(mean_target=mean(!!target))
   
+  #trenger vi denne? 
+  colnames(heat)
   
-#plotting a heatmap
-heatmap<-
-  plot_usmap(data=merge, values="m_h_rate", color="red") + 
-  scale_fill_continuous(high="red", low="white")+
-  theme(legend.position = "right") + labs(fill="Hit Rate") +
-  ggtitle("2009 Hit Rate Average")
+  colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
   
-heatmap
+  #merging the two data frames
+  merge<-left_join(heat,statepop)
 
-
-
-
-
-
+    #Plotting into heatmap 
+  heatmap_plot<-
+    plot_usmap(data=merge, values="mean_target", color="red") + 
+    scale_fill_continuous(high="red", low="white")+
+    theme(legend.position = "right") + labs(fill=target) +
+    ggtitle(paste0("Average of ", target, " in ", season, " USA")) #Får ikke opp target, men rar strek
+  
+  return(heatmap_plot)
+}
+#Calling function
+heatmap(merge_stat,2009,h_rate)
 
