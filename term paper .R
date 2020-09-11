@@ -164,7 +164,9 @@ heat <- nba %>%
                            Team%in% WI ~ "WI"
                                       )) %>% 
   filter(Season==2009) %>% 
-  select(State,h_rate) 
+  select(State,h_rate) %>% 
+  group_by(State) %>% 
+  summarize(m_h_rate=mean(h_rate))
 
 colnames(heat)
 #changing the colname of the statecodes from the statepop dataframe to "State"
@@ -174,7 +176,6 @@ colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
 merge<-left_join(heat,statepop) 
   
   
-
 #plotting a heatmap
 heatmap<-
   plot_usmap(data=merge, values="m_h_rate", color="red") + 
@@ -182,7 +183,7 @@ heatmap<-
   theme(legend.position = "right") + labs(fill="Hit Rate") +
   ggtitle("2009 Hit Rate Average")
   
-
+heatmap
 
 
 
