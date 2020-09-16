@@ -121,9 +121,6 @@ heatmap <- function (data,season,target){
     group_by(State) %>% 
     summarize(mean_target=mean(!!target))
   
-  #trenger vi denne? 
-  colnames(heat)
-  
   colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
   
   #merging the two data frames
@@ -139,5 +136,5 @@ heatmap <- function (data,season,target){
   return(heatmap_plot)
 }
 #Calling function
-heatmap(merge_stat,2009,h_rate)
+heatmap(merge_stat,2009,block_pr_k)
 
