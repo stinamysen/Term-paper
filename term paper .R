@@ -44,11 +44,11 @@ nba <-read.csv("basket.csv") %>%
 #Making a function so that we can look at spesicif players improvement throughout the time period.
 #The parameter data will be the nba data frame we made above. 
 #Players can be anyone of the players in the dataset. 
-#Target refers to what qualification (kan vi bruke et bedre ord her?) we want to look at.
+#Target refers to what qualification  we want to look at.
 
 best <- function(data, players, target) {
   target <- enquo(target) #first we quote the target (by using enquo() function). 
-                          #
+                          
   plot.nba <- data %>%
     filter(Player%in%players) %>% #Filtering so that we only look at the wanted players
     ggplot(aes(x=Season, y=!!target, group=Player, colour=Player))+ #Then we unquote the target (by "!!") 
@@ -87,7 +87,7 @@ for(i in 1:nrow(nba)){
     lm(h_rate~ height_cm, data=nba, subset=-i) %>% #removing (by subset=-i) one of the players
     summary %>%  
     coef %>%   #Hva gjør denne?
-    .[2, 4]    #Selecting the p-value from the regression output - hvorfor 2 og 4?
+    .[2, 4]    #Selecting the p-value from the regression output.
   
   nba$beta_hight[i] <- 
     lm(h_rate~ height_cm, data=nba, subset=-i) %>% 
@@ -139,14 +139,13 @@ heatmap <- function (data,season,target){
     group_by(State) %>%             #Grouping by state so that we can find the mean of target in next line. 
     summarize(mean_target=mean(!!target))
   
-<<<<<<< HEAD
-  colnames(statepop)[colnames(statepop)=="abbr"] <- "State"
-=======
-  colnames(statepop)[colnames(statepop)=="abbr"] <- "State"     #Hvorfor gjør vi dette igjen?
+
+  colnames(statepop)[colnames(statepop)=="abbr"] <- "State"    
+  
   
  
   merge<-left_join(heat,statepop)   #merging the two data frames
->>>>>>> 68393f55ba88497ebb8587c95d06b0fccd8cb1e1
+
   
   heatmap_plot<-                    #Plotting into heatmap 
     plot_usmap(data=merge, values="mean_target", color="red") + 
